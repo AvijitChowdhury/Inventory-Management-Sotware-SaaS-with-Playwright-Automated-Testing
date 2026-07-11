@@ -14,7 +14,7 @@
   <a href="#-tech-stack"><img src="https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white" alt="tailwind"/></a>
   <a href="#-tech-stack"><img src="https://img.shields.io/badge/Postgres-RLS-336791?logo=postgresql&logoColor=white" alt="postgres"/></a>
   <a href="#-end-to-end-testing"><img src="https://img.shields.io/badge/E2E-Playwright%20%2B%20Allure-2EAD33?logo=playwright&logoColor=white" alt="playwright"/></a>
-  <a href="#-end-to-end-testing"><img src="https://img.shields.io/badge/tests-15%2F15%20passing-brightgreen" alt="tests"/></a>
+  <a href="#-end-to-end-testing"><img src="https://img.shields.io/badge/tests-32%2F32%20passing-brightgreen" alt="tests"/></a>
 </p>
 
 ---
@@ -41,7 +41,7 @@
 - **Multi-tenant by design.** Organizations are first-class; users belong to one or more orgs and every table is scoped by `organization_id` at the database layer.
 - **Secure by default.** Row Level Security enforced on every public table, `SECURITY DEFINER` helpers for role checks, storage buckets with per-org policies, and Google + email/password auth out of the box.
 - **Full-stack type safety.** TanStack Start + strict TypeScript + typed server functions + typed router — the same contract flows from database to UI.
-- **Production-grade QA.** A **15-test Playwright suite** covers marketing, auth, onboarding, dashboard and every application route, published as a browsable **Allure report** with screenshots on every step.
+- **Production-grade QA.** A **32-test Playwright suite** (Page Object Model) covers marketing, SEO, auth (valid + invalid credentials), onboarding, dashboard KPIs, protected-route redirects, blog content, every application route and sign-out — published as a browsable **Allure report** with screenshots on every step.
 - **Documented like a product.** System architecture, E2E flow, and every UI state are rendered as diagrams and screenshots checked into the repo.
 
 ---
@@ -173,17 +173,25 @@ allure generate allure-results -o allure-report --clean
 allure open allure-report
 ```
 
-### Result — 15 / 15 passing
+### Result — 32 / 32 passing
 
 | Overview | Suites |
 |---|---|
 | ![Allure overview](docs/screenshots/allure_01_overview.png) | ![Allure suites](docs/screenshots/allure_02_suites.png) |
 
-| Timeline / graph | Behaviors |
+| Graphs | Behaviors |
 |---|---|
-| ![Allure graph](docs/screenshots/allure_03_graph.png) | ![Allure behaviors](docs/screenshots/allure_04_behaviors.png) |
+| ![Allure graphs](docs/screenshots/allure_03_graph.png) | ![Allure behaviors](docs/screenshots/allure_04_behaviors.png) |
 
-Covered flows: landing render, sign-up, sign-in, invalid credentials, onboarding create-org, dashboard KPIs, organization switcher, sidebar navigation to all 10 modules, protected-route redirect, sign-out.
+| Timeline | Categories |
+|---|---|
+| ![Allure timeline](docs/screenshots/allure_05_timeline.png) | ![Allure categories](docs/screenshots/allure_06_categories.png) |
+
+| Packages | New coverage screenshots |
+|---|---|
+| ![Allure packages](docs/screenshots/allure_07_packages.png) | ![Blog guide](docs/screenshots/31_blog_inventory_vs_stock.png) |
+
+Covered flows: landing render + CTAs, `robots.txt`, `sitemap.xml`, `/blog/inventory-vs-stock`, sign-up, sign-in, **invalid credentials**, **protected-route redirect**, onboarding create-org, dashboard KPIs, top-bar account menu, sidebar presence on 5 modules, direct navigation to all 10 modules, products / reports / settings content checks, 404 not-found, and sign-out.
 
 ---
 

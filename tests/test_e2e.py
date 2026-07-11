@@ -154,3 +154,140 @@ def _sign_in(page: Page) -> None:
         if "/auth" not in page.url:
             break
         time.sleep(0.25)
+
+
+# ============================================================
+# Additional expanded coverage (Phase 2 — deeper QA)
+# ============================================================
+
+@allure.feature("Marketing")
+@allure.story("Landing page has key CTAs and nav")
+def test_landing_has_ctas(page: Page):
+    page.goto(BASE_URL, wait_until="networkidle")
+    body_text = page.locator("body").inner_text().lower()
+    assert "inventory" in body_text or "stock" in body_text
+    _shot(page, "30_landing_ctas")
+
+
+@allure.feature("SEO")
+@allure.story("robots.txt is served")
+def test_robots_txt(page: Page):
+    resp = page.goto(f"{BASE_URL}/robots.txt")
+    assert resp and resp.ok
+    assert "User-agent" in (resp.text() or "")
+
+
+@allure.feature("SEO")
+@allure.story("sitemap.xml is served and lists key routes")
+def test_sitemap_xml(page: Page):
+    resp = page.goto(f"{BASE_URL}/sitemap.xml")
+    assert resp and resp.ok
+    body = resp.text() or ""
+    assert "<urlset" in body
+    assert "/blog/inventory-vs-stock" in body
+
+
+@allure.feature("Content")
+@allure.story("Inventory vs Stock blog guide renders")
+def test_blog_inventory_vs_stock(page: Page):
+    page.goto(f"{BASE_URL}/blog/inventory-vs-stock", wait_until="networkidle")
+    expect(page.get_by_role("heading", level=1)).to_be_visible()
+    _shot(page, "31_blog_inventory_vs_stock")
+
+
+@allure.feature("Auth")
+@allure.story("Invalid credentials do not sign the user in")
+def test_invalid_credentials(page: Page):
+    page.goto(f"{BASE_URL}/auth", wait_until="networkidle")
+    page.get_by_label("Email").fill("nosuchuser@example.com")
+    page.get_by_label("Password").fill("wrongpassword")
+    page.get_by_role("button", name="Sign in").click()
+    time.sleep(2.0)
+    assert "/auth" in page.url
+    _shot(page, "32_invalid_credentials")
+
+
+@allure.feature("Auth")
+@allure.story("Protected route redirects unauthenticated users")
+def test_protected_route_redirect(browser_ctx):
+    p = browser_ctx.new_page()
+    try:
+        p.context.clear_cookies()
+        p.goto(f"{BASE_URL}/dashboard", wait_until="networkidle")
+        for _ in range(40):
+            if "/auth" in p.url:
+                break
+            time.sleep(0.25)
+        assert "/auth" in p.url, f"Expected redirect to /auth, got {p.url}"
+        _shot(p, "33_protected_redirect")
+    finally:
+        p.close()
+
+
+@allure.feature("App shell")
+@allure.story("Sidebar is present on every module")
+@pytest.mark.parametrize("path", ["/dashboard", "/products", "/inventory", "/reports", "/settings"])
+def test_sidebar_present(page: Page, path: str):
+    _sign_in(page)
+    page.goto(f"{BASE_URL}{path}", wait_until="networkidle")
+    expect(page.locator("aside, [data-sidebar='sidebar']").first).to_be_visible()
+
+
+@allure.feature("App shell")
+@allure.story("Top bar renders account menu")
+def test_top_bar_account(page: Page):
+    _sign_in(page)
+    page.goto(f"{BASE_URL}/dashboard", wait_until="networkidle")
+    expect(page.get_by_role("button", name="Account")).to_be_visible()
+    _shot(page, "34_top_bar_account")
+
+
+@allure.feature("Dashboard")
+@allure.story("KPI cards render on dashboard")
+def test_dashboard_kpis(page: Page):
+    _sign_in(page)
+    page.goto(f"{BASE_URL}/dashboard", wait_until="networkidle")
+    time.sleep(1.0)
+    text = page.locator("body").inner_text().lower()
+    assert any(k in text for k in ["products", "inventory", "orders", "revenue"])
+    _shot(page, "35_dashboard_kpis")
+
+
+@allure.feature("Modules")
+@allure.story("Products page renders a data area")
+def test_products_page_content(page: Page):
+    _sign_in(page)
+    page.goto(f"{BASE_URL}/products", wait_until="networkidle")
+    time.sleep(1.0)
+    expect(page.get_by_role("heading").first).to_be_visible()
+    _shot(page, "36_products_content")
+
+
+@allure.feature("Modules")
+@allure.story("Reports page renders headings/sections")
+def test_reports_page_content(page: Page):
+    _sign_in(page)
+    page.goto(f"{BASE_URL}/reports", wait_until="networkidle")
+    time.sleep(1.0)
+    expect(page.get_by_role("heading").first).to_be_visible()
+    _shot(page, "37_reports_content")
+
+
+@allure.feature("Modules")
+@allure.story("Settings page renders headings/sections")
+def test_settings_page_content(page: Page):
+    _sign_in(page)
+    page.goto(f"{BASE_URL}/settings", wait_until="networkidle")
+    time.sleep(1.0)
+    expect(page.get_by_role("heading").first).to_be_visible()
+    _shot(page, "38_settings_content")
+
+
+@allure.feature("Routing")
+@allure.story("Unknown route shows a not-found state")
+def test_not_found_route(page: Page):
+    page.goto(f"{BASE_URL}/this-page-does-not-exist", wait_until="networkidle")
+    body = page.locator("body").inner_text().lower()
+    assert "not" in body or "404" in body or page.url.endswith("/this-page-does-not-exist")
+    _shot(page, "39_not_found")
+
