@@ -14,7 +14,7 @@
   <a href="#-tech-stack"><img src="https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white" alt="tailwind"/></a>
   <a href="#-tech-stack"><img src="https://img.shields.io/badge/Postgres-RLS-336791?logo=postgresql&logoColor=white" alt="postgres"/></a>
   <a href="#-end-to-end-testing"><img src="https://img.shields.io/badge/E2E-Playwright%20%2B%20Allure-2EAD33?logo=playwright&logoColor=white" alt="playwright"/></a>
-  <a href="#-end-to-end-testing"><img src="https://img.shields.io/badge/tests-32%2F32%20passing-brightgreen" alt="tests"/></a>
+  <a href="#-end-to-end-testing"><img src="https://img.shields.io/badge/tests-39%2F39%20passing-brightgreen" alt="tests"/></a>
 </p>
 
 ---
@@ -41,7 +41,7 @@
 - **Multi-tenant by design.** Organizations are first-class; users belong to one or more orgs and every table is scoped by `organization_id` at the database layer.
 - **Secure by default.** Row Level Security enforced on every public table, `SECURITY DEFINER` helpers for role checks, storage buckets with per-org policies, and Google + email/password auth out of the box.
 - **Full-stack type safety.** TanStack Start + strict TypeScript + typed server functions + typed router — the same contract flows from database to UI.
-- **Production-grade QA.** A **32-test Playwright suite** (Page Object Model) covers marketing, SEO, auth (valid + invalid credentials), onboarding, dashboard KPIs, protected-route redirects, blog content, every application route and sign-out — published as a browsable **Allure report** with screenshots on every step.
+- **Production-grade QA.** A **39-test Playwright (E2E + CRUD) suite** (Page Object Model) covers marketing, SEO, auth (valid + invalid credentials), onboarding, dashboard KPIs, protected-route redirects, blog content, every application route and sign-out — published as a browsable **Allure report** with screenshots on every step.
 - **Documented like a product.** System architecture, E2E flow, and every UI state are rendered as diagrams and screenshots checked into the repo.
 
 ---
@@ -173,7 +173,7 @@ allure generate allure-results -o allure-report --clean
 allure open allure-report
 ```
 
-### Result — 32 / 32 passing
+### Result — 39 / 39 passing (32 E2E + 7 CRUD)
 
 | Overview | Suites |
 |---|---|
