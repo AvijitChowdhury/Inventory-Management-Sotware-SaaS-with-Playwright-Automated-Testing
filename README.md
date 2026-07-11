@@ -191,7 +191,7 @@ allure open allure-report
 |---|---|
 | ![Allure packages](docs/screenshots/allure_07_packages.png) | ![Blog guide](docs/screenshots/31_blog_inventory_vs_stock.png) |
 
-Covered flows: landing render + CTAs, `robots.txt`, `sitemap.xml`, `/blog/inventory-vs-stock`, sign-up, sign-in, **invalid credentials**, **protected-route redirect**, onboarding create-org, dashboard KPIs, top-bar account menu, sidebar presence on 5 modules, direct navigation to all 10 modules, products / reports / settings content checks, 404 not-found, and sign-out.
+Covered flows: landing render + CTAs, `robots.txt`, `sitemap.xml`, `/blog/inventory-vs-stock`, sign-up, sign-in, **invalid credentials**, **protected-route redirect**, onboarding create-org, dashboard KPIs, top-bar account menu, sidebar presence on 5 modules, direct navigation to all 10 modules, products / reports / settings content checks, 404 not-found, sign-out, and **full CRUD** (create → verify → delete) for Categories, Suppliers, Customers, and Products plus organization-name edit + persistence, inventory adjust-stock control, and reports KPI sections.
 
 ---
 
