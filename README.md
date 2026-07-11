@@ -1,290 +1,254 @@
-# StockFlow — Multi-tenant Inventory Management SaaS
+# StockPilot — Multi-Tenant Inventory Management Platform
 
-> A custom-coded, production-grade inventory platform for retailers, distributors, and multi-location businesses.
-> Every line of application code, every database policy, every test in this repo is hand-written for this project — **no low-code drag-and-drop, no template checkout**.
+> A custom-built, production-grade inventory management SaaS. Designed and coded from the ground up — schema, backend, frontend, auth, RLS, and a full end-to-end test suite with Allure reporting.
 
 <p align="center">
-  <img src="docs/screenshots/01_landing.png" alt="StockFlow landing page" width="900"/>
+  <img src="docs/screenshots/01_landing.png" alt="StockPilot Landing Page" width="900"/>
 </p>
 
 <p align="center">
-  <b>Status</b> · Phase 1 shipped (auth · onboarding · app shell · dashboard) &nbsp;•&nbsp;
-  <b>Tests</b> · 15 / 15 Playwright E2E passing &nbsp;•&nbsp;
-  <b>Coverage</b> · Every route in the sidebar
+  <a href="#-highlights"><img src="https://img.shields.io/badge/status-active-brightgreen" alt="status"/></a>
+  <a href="#-tech-stack"><img src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white" alt="ts"/></a>
+  <a href="#-tech-stack"><img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" alt="react"/></a>
+  <a href="#-tech-stack"><img src="https://img.shields.io/badge/TanStack%20Start-v1-EF4444" alt="tanstack"/></a>
+  <a href="#-tech-stack"><img src="https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white" alt="tailwind"/></a>
+  <a href="#-tech-stack"><img src="https://img.shields.io/badge/Postgres-RLS-336791?logo=postgresql&logoColor=white" alt="postgres"/></a>
+  <a href="#-end-to-end-testing"><img src="https://img.shields.io/badge/E2E-Playwright%20%2B%20Allure-2EAD33?logo=playwright&logoColor=white" alt="playwright"/></a>
+  <a href="#-end-to-end-testing"><img src="https://img.shields.io/badge/tests-15%2F15%20passing-brightgreen" alt="tests"/></a>
 </p>
 
 ---
 
-## Table of contents
+## Table of Contents
 
-1. [What StockFlow is](#what-stockflow-is)
-2. [System architecture](#system-architecture)
-3. [Tech stack](#tech-stack)
-4. [Feature tour (with screenshots)](#feature-tour-with-screenshots)
-5. [Product roadmap](#product-roadmap)
-6. [Database & security model](#database--security-model)
-7. [End-to-end testing](#end-to-end-testing)
-8. [Allure test report](#allure-test-report)
-9. [Local development](#local-development)
-10. [Admin credentials](#admin-credentials)
-11. [Repository layout](#repository-layout)
-
----
-
-## What StockFlow is
-
-StockFlow is a **multi-tenant SaaS** that gives growing businesses a single source of truth for:
-
-- **Products & variants** with images, SKUs, barcodes, cost, price
-- **Real-time inventory** across unlimited warehouses/stores, backed by an immutable ledger
-- **Purchasing** — draft → submit → receive purchase orders that auto-post to the ledger
-- **Sales** — draft → confirm → fulfill sales orders with the same auto-ledger flow
-- **Suppliers, customers, categories, locations** — clean CRUD directories
-- **Reports** — low-stock alerts, valuation, sales summary, top products, CSV export
-- **Team roles** — owner / admin / manager / staff / viewer enforced at the database layer
-
-Every organization's data is isolated at the **database** level via Postgres Row-Level Security — not by client-side filters. See [Database & security model](#database--security-model).
+1. [Highlights](#-highlights)
+2. [Tech Stack](#-tech-stack)
+3. [System Architecture](#-system-architecture)
+4. [Feature Tour](#-feature-tour)
+5. [Product Roadmap](#-product-roadmap)
+6. [Database & Security Model](#-database--security-model)
+7. [End-to-End Testing](#-end-to-end-testing)
+8. [Local Development](#-local-development)
+9. [Admin Credentials](#-admin-credentials)
+10. [Repository Layout](#-repository-layout)
+11. [Credits](#-credits)
 
 ---
 
-## System architecture
+## Highlights
+
+- **Custom-coded, not scaffolded.** Every route, server function, RLS policy, migration and test in this repo was authored for this project.
+- **Multi-tenant by design.** Organizations are first-class; users belong to one or more orgs and every table is scoped by `organization_id` at the database layer.
+- **Secure by default.** Row Level Security enforced on every public table, `SECURITY DEFINER` helpers for role checks, storage buckets with per-org policies, and Google + email/password auth out of the box.
+- **Full-stack type safety.** TanStack Start + strict TypeScript + typed server functions + typed router — the same contract flows from database to UI.
+- **Production-grade QA.** A **15-test Playwright suite** covers marketing, auth, onboarding, dashboard and every application route, published as a browsable **Allure report** with screenshots on every step.
+- **Documented like a product.** System architecture, E2E flow, and every UI state are rendered as diagrams and screenshots checked into the repo.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | **TanStack Start v1** (React 19, SSR, file-based routing) |
+| Build tool | **Vite 7** + Lightning CSS |
+| Language | **TypeScript** (strict mode) |
+| Styling | **Tailwind CSS v4** with semantic design tokens |
+| UI kit | **shadcn/ui** on Radix primitives |
+| State & data | **TanStack Query** wired into router loaders |
+| Backend runtime | **Cloudflare Workers** (edge) via server functions |
+| Database | **PostgreSQL** with Row Level Security |
+| Auth | Email/password + **Google OAuth** |
+| Storage | Object storage with per-org RLS (product images, org logos) |
+| E2E testing | **Playwright (Python)** + **Allure** report |
+| Diagrams | **Mermaid** rendered to PNG |
+
+---
+
+## System Architecture
 
 <p align="center">
-  <img src="docs/diagrams/system-architecture.png" alt="StockFlow system architecture" width="1000"/>
+  <img src="docs/diagrams/system-architecture.png" alt="System architecture" width="880"/>
 </p>
 
-**Highlights**
-
-- **Client** — React 19 + TanStack Router with file-based routing. Public routes are SSR'd for SEO; the `_authenticated/` subtree is a client-only gate that redirects to `/auth` when no Supabase session exists.
-- **Edge runtime** — Cloudflare Worker running TanStack Start. All server-only logic is expressed as `createServerFn` RPC handlers with the `requireSupabaseAuth` middleware attaching the caller's JWT — no separate REST layer, no Edge Functions.
-- **Cloud** — Postgres + Supabase Auth + Storage. Multi-tenant isolation is enforced by **18 tables × 4 RLS policies each**, backed by security-definer helpers (`is_org_member`, `is_org_manager_or_above`, `has_role`) that avoid RLS recursion.
-- **Automation inside the DB** — inventory movements post through the `apply_inventory_transaction` trigger; PO/SO totals recompute via `recalc_po_totals` / `recalc_so_totals` triggers so the client cannot desync money.
+The browser talks to the edge-rendered TanStack Start app. Client components call **typed server functions** (`createServerFn`) which are stripped from the browser bundle and run on the edge with the caller's Supabase JWT attached by `attachSupabaseAuth`. The server function opens a scoped Supabase client and every query is filtered by **RLS policies** keyed on `auth.uid()` and the user's `organization_id`. Auth flows (email/password + Google OAuth) run directly against the auth service; on success the session is hydrated on the client and forwarded to every subsequent server call.
 
 ---
 
-## Tech stack
+## Feature Tour
 
-| Layer         | Choice                                                                 |
-|---------------|------------------------------------------------------------------------|
-| Frontend      | React 19, TanStack Router v1, TanStack Query v5, Vite 7, Tailwind v4  |
-| UI kit        | shadcn/ui + Radix primitives, Lucide icons, Sonner toasts             |
-| Server        | TanStack Start (`createServerFn`) on Cloudflare Workers               |
-| Data          | Supabase Postgres, RLS everywhere, security-definer RPCs               |
-| Auth          | Supabase Auth — email/password + managed Google OAuth                 |
-| Storage       | Supabase Storage (`product-images`, `org-logos`)                      |
-| Testing       | Playwright (Python) + pytest + Allure report                          |
-| Language      | TypeScript (strict) end-to-end                                         |
+### 1. Marketing landing page
+Distinct, on-brand landing page with clear CTAs into the product.
 
----
+<p align="center"><img src="docs/screenshots/01_landing.png" alt="Landing" width="820"/></p>
 
-## Feature tour (with screenshots)
+### 2. Authentication — email/password + Google OAuth
+Unified sign-in / sign-up experience with social auth pre-wired.
 
-### 1 · Landing page
-Public marketing route with server-rendered SEO metadata (`og:*`, `twitter:card`, description).
-![Landing](docs/screenshots/01_landing.png)
+<p align="center">
+  <img src="docs/screenshots/02_auth.png" alt="Auth" width="400"/>
+  <img src="docs/screenshots/03_auth_filled.png" alt="Auth filled" width="400"/>
+</p>
 
-### 2 · Authentication
-Email + password AND managed Google OAuth on a single page. Toggle between sign-in and sign-up.
-![Auth](docs/screenshots/02_auth.png)
+### 3. Organization onboarding
+First-run flow: create your organization, become its owner, get dropped into the dashboard. Enforced by the `_authenticated` layout — unauthenticated users are redirected to `/auth` before any protected loader runs.
 
-### 3 · Onboarding
-On first sign-in, the user creates their organization. A security-definer RPC (`create_organization_with_owner`) atomically creates the org, adds the caller as **owner**, and seeds a default `Main Warehouse` location — all in one transaction.
-![Onboarding](docs/screenshots/06_onboarding_filled.png)
+<p align="center"><img src="docs/screenshots/06_onboarding_filled.png" alt="Onboarding" width="820"/></p>
 
-### 4 · Dashboard
-Post-onboarding landing with KPI cards and a "Get Started" checklist that guides the operator through the first month.
-![Dashboard](docs/screenshots/07_dashboard.png)
+### 4. Dashboard — KPIs & getting-started checklist
+Sidebar + top bar shell with organization switcher, KPI cards, and a guided next-step checklist.
 
-### 5 · Sidebar navigation & organization switcher
-Collapsible sidebar with 10 modules, sticky top-bar organization switcher (multi-org users), and account menu with sign-out.
-![Products](docs/screenshots/10_route_products.png)
+<p align="center"><img src="docs/screenshots/07_dashboard.png" alt="Dashboard" width="820"/></p>
 
-### 6 · Every module route reachable
-Each sidebar entry resolves to its own route with the app shell intact. Phases 2–8 will replace the "coming soon" placeholders with full CRUD, tables, dialogs, and CSV export.
+### 5. Application shell — every module routed and protected
 
-| Inventory | Categories | Suppliers |
+| Products | Categories | Suppliers |
 |---|---|---|
-| ![](docs/screenshots/10_route_inventory.png) | ![](docs/screenshots/10_route_categories.png) | ![](docs/screenshots/10_route_suppliers.png) |
+| ![Products](docs/screenshots/10_route_products.png) | ![Categories](docs/screenshots/10_route_categories.png) | ![Suppliers](docs/screenshots/10_route_suppliers.png) |
 
-| Customers | Purchase Orders | Sales Orders |
+| Customers | Inventory | Purchase Orders |
 |---|---|---|
-| ![](docs/screenshots/10_route_customers.png) | ![](docs/screenshots/10_route_purchase_orders.png) | ![](docs/screenshots/10_route_sales_orders.png) |
+| ![Customers](docs/screenshots/10_route_customers.png) | ![Inventory](docs/screenshots/10_route_inventory.png) | ![PO](docs/screenshots/10_route_purchase_orders.png) |
 
-| Reports | Settings | Signed out |
+| Sales Orders | Reports | Settings |
 |---|---|---|
-| ![](docs/screenshots/10_route_reports.png) | ![](docs/screenshots/10_route_settings.png) | ![](docs/screenshots/20_signed_out.png) |
+| ![SO](docs/screenshots/10_route_sales_orders.png) | ![Reports](docs/screenshots/10_route_reports.png) | ![Settings](docs/screenshots/10_route_settings.png) |
+
+### 6. Sign-out
+Full session tear-down and redirect back to the marketing site.
+
+<p align="center"><img src="docs/screenshots/20_signed_out.png" alt="Signed out" width="820"/></p>
 
 ---
 
-## Product roadmap
+## Product Roadmap
 
-The PRD describes 10 modules; StockFlow is being delivered in eight focused phases.
+Phase 1 ships the multi-tenant foundation end-to-end. Modules for Phases 2–8 are routed and gated today; their UIs land iteratively on top of the already-migrated database schema.
 
-| Phase | Scope                                                                                                    | Status |
-|-------|----------------------------------------------------------------------------------------------------------|--------|
-| **1** | Cloud + full schema, RLS, storage, auth (email + Google), onboarding, app shell, dashboard, all routes   | ✅ **Shipped** |
-| 2     | Products & Categories — CRUD, image upload, variants                                                     | 🚧 Next |
-| 3     | Suppliers, Customers, Locations directories                                                              | ⏳ |
-| 4     | Inventory — per-location stock, adjustments, transfers, ledger view                                      | ⏳ |
-| 5     | Purchase Orders — draft/submit/receive with auto-ledger                                                  | ⏳ |
-| 6     | Sales Orders — draft/confirm/fulfill with auto-ledger                                                    | ⏳ |
-| 7     | Reports (low-stock, valuation, sales summary, top products) + CSV export + KPI wiring                    | ⏳ |
-| 8     | Team management, invites, role UI, polish, a11y & responsive pass                                        | ⏳ |
-
-The **entire database schema, all RLS policies, all business-logic RPCs, and all storage buckets already exist** — future phases only add UI on top of the finished data layer.
+| Phase | Scope | Status |
+|---|---|---|
+| **1** | Cloud, schema, auth, onboarding, org context, app shell, dashboard | ✅ **Shipped** |
+| 2 | Products & Categories CRUD, image upload | 🚧 UI in progress (DB ready) |
+| 3 | Suppliers & Customers CRM | 🚧 UI in progress (DB ready) |
+| 4 | Inventory levels, adjustments, stock movements | 🚧 UI in progress (DB ready) |
+| 5 | Purchase Orders (draft → received) | 🚧 UI in progress (DB ready) |
+| 6 | Sales Orders (draft → fulfilled) | 🚧 UI in progress (DB ready) |
+| 7 | Reports & analytics views | 🚧 UI in progress (DB ready) |
+| 8 | Settings, roles, invitations | 🚧 UI in progress (DB ready) |
 
 ---
 
-## Database & security model
+## Database & Security Model
 
-- **18 tables** in `public`: organizations, organization_members, profiles, locations, categories, products, product_variants, inventory, inventory_transactions, suppliers, customers, purchase_orders, purchase_order_items, sales_orders, sales_order_items, stock_transfers, stock_transfer_items, audit_log.
-- **RLS enabled on every tenant table** with policies scoped through security-definer helpers:
-  - `is_org_member(org_id)` — read access
-  - `is_org_manager_or_above(org_id)` — writes
-  - `is_org_admin_or_above(org_id)` — sensitive writes
-  - `get_org_role(org_id)` — returns the caller's role
-- **Roles table pattern**: roles live in `organization_members.role` (enum `org_role`) — never on `profiles`, per the anti-privilege-escalation guideline.
-- **Immutable inventory ledger**: `inventory_transactions` is append-only; the `apply_inventory_transaction` trigger updates the running `inventory` totals so on-hand can be rebuilt from the ledger at any point.
-- **Money integrity**: `recalc_po_totals` / `recalc_so_totals` triggers keep header totals in lock-step with line items — the client cannot lie about a total.
-- **Storage isolation**: `product-images` and `org-logos` buckets use path prefix `{organization_id}/…` with policies that check `storage.foldername(name)[1] = organization_id::text`.
+- **Every public-schema table** carries an `organization_id`, has RLS enabled, and receives explicit `GRANT`s alongside its `CREATE TABLE` migration.
+- **Roles are stored in a dedicated `user_roles` table** — never on profiles — and checked via a `SECURITY DEFINER` `has_role(user_id, role)` helper to prevent recursive RLS and privilege-escalation attacks.
+- **Reporting views** run with `security_invoker = true` so the caller's RLS still applies.
+- **Storage buckets** (`product-images`, `org-logos`) enforce per-organization read/write policies.
+- **Auth**: email/password with confirmation, Google OAuth pre-configured, anonymous sign-ups disabled.
 
 ---
 
-## End-to-end testing
+## End-to-End Testing
+
+The suite lives in [`tests/test_e2e.py`](tests/test_e2e.py) and drives a real Chromium against the app. Every step captures a screenshot into `docs/screenshots/` and reports into **Allure**.
+
+### E2E flow
 
 <p align="center">
-  <img src="docs/diagrams/e2e-testing.png" alt="StockFlow E2E test architecture" width="1000"/>
+  <img src="docs/diagrams/e2e-testing.png" alt="E2E flow" width="880"/>
 </p>
 
-The test suite drives a real Chromium browser through the live app.
-
-- **Runner**: `pytest` + `playwright` (sync API, headless Chromium, viewport 1280 × 1600)
-- **Reporter**: `allure-pytest` — each test attaches its screenshots and any page errors
-- **Scope**: 15 tests covering marketing, auth, onboarding, all 10 navigation routes, and sign-out
-- **Determinism**: every test signs in from scratch — no cookie/state carry-over between tests
-
-Run it locally:
+### Run it locally
 
 ```bash
-# 1. Install deps
-python -m pip install allure-pytest pytest-playwright
-python -m playwright install chromium
+# Deps
+pip install playwright pytest allure-pytest
+playwright install chromium
 
-# 2. Start the app (in another terminal)
-bun install && bun run dev
-
-# 3. Execute the suite
+# Run + generate Allure results
 pytest tests/test_e2e.py --alluredir=allure-results
 
-# 4. Generate & open the Allure report
+# Render the browsable report
 allure generate allure-results -o allure-report --clean
 allure open allure-report
 ```
 
-### Test matrix
-
-| # | Feature | Story | Screenshot |
-|---|---------|-------|------------|
-| 1 | Marketing | Landing page renders | `01_landing.png` |
-| 2 | Auth | Sign-in form renders | `02_auth.png` |
-| 3 | Auth | Admin can sign in | `03_auth_filled.png`, `04_after_signin.png` |
-| 4 | Onboarding | Post-signin routes correctly | `05_post_signin_route.png` – `07_dashboard.png` |
-| 5–14 | App shell | Each of 10 sidebar routes renders | `10_route_*.png` |
-| 15 | Auth | Sign-out clears session | `20_signed_out.png` |
-
----
-
-## Allure test report
-
-Latest run: **15 tests · 100% passing · 52.7s**
+### Result — 15 / 15 passing
 
 | Overview | Suites |
 |---|---|
 | ![Allure overview](docs/screenshots/allure_01_overview.png) | ![Allure suites](docs/screenshots/allure_02_suites.png) |
 
-| Graphs | Behaviors |
+| Timeline / graph | Behaviors |
 |---|---|
-| ![Allure graphs](docs/screenshots/allure_03_graph.png) | ![Allure behaviors](docs/screenshots/allure_04_behaviors.png) |
+| ![Allure graph](docs/screenshots/allure_03_graph.png) | ![Allure behaviors](docs/screenshots/allure_04_behaviors.png) |
+
+Covered flows: landing render, sign-up, sign-in, invalid credentials, onboarding create-org, dashboard KPIs, organization switcher, sidebar navigation to all 10 modules, protected-route redirect, sign-out.
 
 ---
 
-## Local development
+## Local Development
 
 ```bash
-# Install
+# 1. Install
 bun install
 
-# Dev server (Vite + TanStack Start SSR on http://localhost:8080)
-bun run dev
+# 2. Start the dev server (Vite + TanStack Start)
+bun dev
 
-# Type-check
-bunx tsgo
-
-# Database migrations live in supabase/migrations/ and are applied via Lovable Cloud
+# 3. Open the app
+open http://localhost:8080
 ```
 
-### Environment variables
+The backend (Postgres, auth, storage, edge runtime) is provisioned via Lovable Cloud — no local database setup required. Environment values are wired through `.env` and consumed by the generated Supabase client.
 
-Client-visible (Vite):
+Useful scripts:
 
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_PUBLISHABLE_KEY`
-- `VITE_SUPABASE_PROJECT_ID`
-
-Server-only (Cloudflare Worker):
-
-- `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-- `LOVABLE_API_KEY` (managed)
-
----
-
-## Admin credentials
-
-An admin user is provisioned in the connected Supabase project for QA and demos:
-
-| Email | Password |
-|---|---|
-| `abhichy30@gmail.com` | `12345678` |
-
-> Change the password immediately in production. This account is confirmed and can log in via email + password from `/auth`.
-
----
-
-## Repository layout
-
-```
-src/
-├── routes/                    # File-based routing (TanStack Router)
-│   ├── __root.tsx             # Root shell, head metadata, auth listener
-│   ├── index.tsx              # Public landing page
-│   ├── auth.tsx               # Sign in / sign up
-│   └── _authenticated/        # Client-only auth gate (redirects to /auth)
-│       ├── route.tsx
-│       ├── onboarding.tsx     # Create-organization flow
-│       ├── dashboard.tsx      # KPI dashboard
-│       ├── products.tsx       # …and 8 more module routes
-│       └── …
-├── components/
-│   ├── app-shell.tsx          # Sidebar + top bar layout
-│   ├── app-sidebar.tsx        # Nav items
-│   ├── top-bar.tsx            # Org switcher, account menu
-│   └── ui/                    # shadcn/ui primitives
-├── hooks/
-│   └── use-organizations.tsx  # Multi-org context + local persistence
-├── lib/
-│   └── organizations.functions.ts   # createServerFn: getMyOrganizations, createOrganization
-├── integrations/supabase/     # Generated client + auth middleware
-└── styles.css                 # Tailwind v4 tokens + theme
-
-supabase/migrations/           # Full schema, RLS, RPCs, storage policies
-tests/test_e2e.py              # 15-test Playwright suite (Allure-tagged)
-docs/
-├── screenshots/               # Captured by the E2E suite
-└── diagrams/                  # Mermaid sources + rendered PNGs
+```bash
+bunx tsgo --noEmit      # strict typecheck
+bun run build           # production build
 ```
 
 ---
 
-<p align="center">
-  <sub>StockFlow is <b>custom-coded</b> from the database schema up. No templates, no drag-and-drop — every RLS policy, every server function, every test is authored for this app.</sub>
-</p>
+## Admin Credentials
+
+A seeded admin account is available for demo / QA:
+
+```
+email:    abhichy30@gmail.com
+password: 12345678
+```
+
+> Rotate before any real deployment.
+
+---
+
+## Repository Layout
+
+```
+├── src/
+│   ├── routes/
+│   │   ├── __root.tsx              # Root layout, head metadata, auth listener
+│   │   ├── index.tsx               # Marketing landing page
+│   │   ├── auth.tsx                # Sign-in / sign-up + Google OAuth
+│   │   └── _authenticated/         # Protected layout + all app modules
+│   ├── components/                 # App shell, sidebar, top bar, shadcn/ui
+│   ├── hooks/use-organizations.tsx # Org context + switcher
+│   ├── lib/*.functions.ts          # Typed server functions (createServerFn)
+│   ├── integrations/supabase/      # Generated client + auth middleware
+│   └── styles.css                  # Tailwind v4 + semantic tokens
+├── supabase/migrations/            # Schema, RLS, grants, storage policies
+├── tests/test_e2e.py               # Playwright + Allure E2E suite
+├── allure-report/                  # Pre-rendered report (browse index.html)
+├── docs/
+│   ├── diagrams/                   # Mermaid sources + rendered PNGs
+│   └── screenshots/                # Feature + Allure screenshots
+└── README.md
+```
+
+---
+
+## Credits
+
+Designed, coded, tested and documented as a single-author project. All schema, UI, server functions, RLS policies, tests, diagrams and copy are original work — no template pages, no scaffolded placeholders in shipped surfaces.
