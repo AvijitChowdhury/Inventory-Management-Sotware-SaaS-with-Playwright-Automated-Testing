@@ -14,7 +14,7 @@
   <a href="#-tech-stack"><img src="https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white" alt="tailwind"/></a>
   <a href="#-tech-stack"><img src="https://img.shields.io/badge/Postgres-RLS-336791?logo=postgresql&logoColor=white" alt="postgres"/></a>
   <a href="#-end-to-end-testing"><img src="https://img.shields.io/badge/E2E-Playwright%20%2B%20Allure-2EAD33?logo=playwright&logoColor=white" alt="playwright"/></a>
-  <a href="#-end-to-end-testing"><img src="https://img.shields.io/badge/tests-15%2F15%20passing-brightgreen" alt="tests"/></a>
+  <a href="#-end-to-end-testing"><img src="https://img.shields.io/badge/tests-32%2F32%20passing-brightgreen" alt="tests"/></a>
 </p>
 
 ---
