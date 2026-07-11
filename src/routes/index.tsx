@@ -23,12 +23,12 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "StockFlow — Real-time Inventory Management",
+        content: "StockFlow — Real-time Inventory Management for Growing Teams",
       },
       {
         property: "og:description",
         content:
-          "One platform for products, stock, suppliers, customers, purchasing, and sales — built for multi-location teams.",
+          "Track stock, purchase orders, and sales in one place. StockFlow gives retailers and distributors a single source of truth across every location.",
       },
       { property: "og:url", content: "https://item-chum-flow.lovable.app/" },
     ],

@@ -79,19 +79,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "StockFlow — Multi-tenant Inventory Management" },
+      { title: "StockFlow — Real-time Inventory Management for Growing Teams" },
       {
         name: "description",
         content:
-          "StockFlow is a modern multi-tenant inventory management platform for retailers, distributors, and multi-location businesses.",
+          "Track stock, purchase orders, and sales in one place. StockFlow gives retailers and distributors a single source of truth across every location.",
       },
       { property: "og:site_name", content: "StockFlow" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "StockFlow — Real-time Inventory Management for Growing Teams" },
+      { name: "twitter:title", content: "StockFlow — Real-time Inventory Management for Growing Teams" },
+      { property: "og:description", content: "Track stock, purchase orders, and sales in one place. StockFlow gives retailers and distributors a single source of truth across every location." },
+      { name: "twitter:description", content: "Track stock, purchase orders, and sales in one place. StockFlow gives retailers and distributors a single source of truth across every location." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/a3566681-eeed-41b8-9d9f-2b7f61dde9e6" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/a3566681-eeed-41b8-9d9f-2b7f61dde9e6" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
       {
