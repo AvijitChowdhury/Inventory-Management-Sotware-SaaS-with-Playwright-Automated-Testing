@@ -1,40 +1,59 @@
 flowchart LR
-    subgraph Dev["👨‍💻 Developer / CI"]
-        RUN["pytest tests/test_e2e.py<br/>--alluredir=allure-results"]
+    subgraph Dev["Developer / CI"]
+        RUN["python tests/e2e_pom.py"]
     end
 
-    subgraph PW["🎭 Playwright (Python, headless Chromium)"]
-        FX["session fixture:<br/>browser + context (1280×1600)"]
-        T1["test_landing_page"]
-        T2["test_auth_page"]
-        T3["test_admin_sign_in"]
-        T4["test_post_signin_flow"]
-        T5["test_navigation × 10 routes"]
-        T6["test_sign_out"]
+    subgraph POM["Page Object Model (tests/pages/)"]
+        BP["BasePage<br/>goto · screenshot · has_text"]
+        LP["LandingPage"]
+        AP["AuthPage<br/>sign_in · wait_until_signed_in"]
+        OP["OnboardingPage<br/>create_org"]
+        MP["ModulePage<br/>generic route wrapper"]
     end
 
-    subgraph App["🧪 StockFlow app under test"]
+    subgraph Runner["e2e_pom.py orchestrator"]
+        FX["Playwright Chromium<br/>headless · 1280x1800"]
+        S1["Landing + Auth render"]
+        S2["Admin sign-in flow"]
+        S3["Onboarding (conditional)"]
+        S4["10 module routes"]
+        S5["Sign-out + public home"]
+    end
+
+    subgraph App["StockFlow app under test"]
         LOCAL["Vite dev server<br/>localhost:8080"]
-        SB["Supabase project<br/>(shared with prod schema)"]
+        SB["Supabase<br/>Auth + Postgres + RLS"]
     end
 
-    subgraph Report["📊 Reporting"]
-        AR["allure-results/*.json<br/>+ PNG attachments"]
-        HTML["allure generate → HTML report"]
-        DOCS["docs/screenshots/*.png<br/>embedded in README"]
+    subgraph Report["Reporting artifacts"]
+        JSON["tests/results/report.json<br/>step status + timings"]
+        SHOTS["docs/screenshots/*.png<br/>refreshed each run"]
+        ALLURE["allure-report/<br/>Allure HTML dashboard"]
+        RM["README.md<br/>embeds screenshots"]
     end
 
     RUN --> FX
-    FX --> T1 --> T2 --> T3 --> T4 --> T5 --> T6
-    T1 & T2 & T3 & T4 & T5 & T6 -->|HTTP + auth| LOCAL
-    LOCAL <-->|SDK / RPC| SB
-    T1 & T2 & T3 & T4 & T5 & T6 -->|screenshot + allure.attach| AR
-    T1 & T2 & T3 & T4 & T5 & T6 -->|_shot| DOCS
-    AR --> HTML
+    FX --> S1 --> S2 --> S3 --> S4 --> S5
 
-    classDef pw fill:#2EAD33,stroke:#1e6b21,color:#fff;
+    S1 --> LP
+    S2 --> AP
+    S3 --> OP
+    S4 --> MP
+    LP & AP & OP & MP --> BP
+
+    S1 & S2 & S3 & S4 & S5 -->|HTTP| LOCAL
+    LOCAL <-->|SDK / RPC| SB
+
+    S1 & S2 & S3 & S4 & S5 -->|screenshot| SHOTS
+    S1 & S2 & S3 & S4 & S5 -->|step result| JSON
+    JSON --> ALLURE
+    SHOTS --> RM
+
+    classDef pom fill:#2EAD33,stroke:#1e6b21,color:#fff;
+    classDef run fill:#6B4EFF,stroke:#3a2aa1,color:#fff;
     classDef app fill:#1F3A5F,stroke:#1F3A5F,color:#fff;
     classDef rep fill:#F4A261,stroke:#a86432,color:#1a1a1a;
-    class FX,T1,T2,T3,T4,T5,T6 pw;
+    class BP,LP,AP,OP,MP pom;
+    class FX,S1,S2,S3,S4,S5 run;
     class LOCAL,SB app;
-    class AR,HTML,DOCS rep;
+    class JSON,SHOTS,ALLURE,RM rep;
