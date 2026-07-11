@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /products
+Disallow: /inventory
+Disallow: /categories
+Disallow: /suppliers
+Disallow: /customers
+Disallow: /purchase-orders
+Disallow: /sales-orders
+Disallow: /reports
+Disallow: /settings
+
+Sitemap: https://item-chum-flow.lovable.app/sitemap.xml
