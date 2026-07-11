@@ -43,7 +43,7 @@ export const getReportSummary = createServerFn({ method: "POST" })
 
     const po = (poRes.data ?? []) as any[];
     const so = (soRes.data ?? []) as any[];
-    const openPOs = po.filter((p) => ["draft", "sent", "partial"].includes(p.status)).length;
+    const openPOs = po.filter((p) => ["draft", "submitted", "partially_received"].includes(p.status)).length;
     const poValue = po.reduce((a, p) => a + Number(p.total ?? 0), 0);
     const salesValue = so.reduce((a, p) => a + Number(p.total ?? 0), 0);
     const monthStart = new Date();

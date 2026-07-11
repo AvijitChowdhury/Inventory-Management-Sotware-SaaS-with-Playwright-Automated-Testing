@@ -133,7 +133,7 @@ export const adjustInventory = createServerFn({ method: "POST" })
       organization_id: data.organizationId,
       product_id: data.product_id,
       location_id: data.location_id,
-      transaction_type: "adjustment",
+      transaction_type: data.quantity_change >= 0 ? "adjustment_increase" : "adjustment_decrease",
       quantity_change: data.quantity_change,
       notes: data.notes ?? null,
       created_by: context.userId,
