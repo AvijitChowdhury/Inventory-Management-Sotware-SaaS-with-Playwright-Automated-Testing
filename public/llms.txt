@@ -1,0 +1,7 @@
+# StockFlow
+
+> StockFlow is a multi-tenant inventory management platform for retailers, distributors, and multi-location businesses. Track products, stock, purchase orders, and sales orders in real time.
+
+## Pages
+
+- [Home](/): Overview of StockFlow's inventory, purchasing, and sales features.
