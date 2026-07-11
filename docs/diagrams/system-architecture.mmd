@@ -1,8 +1,10 @@
 flowchart TB
-    subgraph Client["🌐 Browser (React 19 + TanStack Router)"]
-        L["Landing / Marketing"]
-        A["/auth (Sign in / Sign up)"]
-        subgraph Protected["🔒 _authenticated layout (ssr:false gate)"]
+    subgraph Client["Browser — React 19 + TanStack Router"]
+        L["/ Landing"]
+        BL["/blog/inventory-vs-stock"]
+        A["/auth (email + Google)"]
+        SM["/sitemap.xml"]
+        subgraph Protected["_authenticated layout — ssr:false client gate"]
             OB["/onboarding"]
             D["/dashboard"]
             P["/products"]
@@ -17,32 +19,60 @@ flowchart TB
         end
     end
 
-    subgraph Edge["⚡ Cloudflare Worker (TanStack Start SSR)"]
+    subgraph Edge["Cloudflare Worker — TanStack Start"]
         SSR["SSR renderer + Vite bundle"]
         SF["createServerFn RPC handlers"]
-        MW["requireSupabaseAuth middleware"]
+        MW["requireSupabaseAuth<br/>middleware (Bearer JWT)"]
+        ATT["attachSupabaseAuth<br/>client function middleware"]
     end
 
-    subgraph Cloud["☁️ Lovable Cloud (Supabase)"]
-        AUTH["Supabase Auth<br/>email + Google OAuth"]
-        DB[("PostgreSQL<br/>18 tables + RLS")]
-        RPC["Security-definer RPCs<br/>create_organization_with_owner<br/>is_org_member / has_role"]
+    subgraph Cloud["Lovable Cloud (Supabase)"]
+        AUTH["Supabase Auth<br/>email/password + Google OAuth<br/>HIBP off · auto-confirm on"]
+        DB[("PostgreSQL 15<br/>tenant tables + RLS")]
+        HELPERS["SECURITY DEFINER helpers<br/>is_org_member · get_org_role<br/>is_org_manager_or_above<br/>is_org_admin_or_above<br/>create_organization_with_owner"]
+        TRIG["Triggers<br/>recalc_po_totals<br/>recalc_so_totals<br/>apply_inventory_transaction"]
         ST["Storage buckets<br/>product-images · org-logos"]
     end
 
+    subgraph SEO["SEO / Discovery"]
+        ROB["robots.txt"]
+        LLMS["llms.txt"]
+        JLD["JSON-LD<br/>Organization + WebSite + Article"]
+    end
+
+    subgraph QA["Quality Assurance"]
+        POM["Playwright POM suite<br/>tests/e2e_pom.py"]
+        ALLURE["Allure HTML report"]
+    end
+
     L --> A
+    L --> BL
     A -->|password / OAuth| AUTH
     A --> OB
-    OB -->|createOrganization| SF
+    OB -->|createOrganization RPC| SF
     D & P & I & C & SUP & CUST & PO & SO & R & S -->|useServerFn| SF
 
     Client <-->|HTML + hydration| SSR
+    Client --> ATT --> SF
     SF --> MW --> AUTH
-    MW -->|Bearer JWT| DB
-    SF --> RPC --> DB
-    P & I -->|upload| ST
+    MW -->|as current user| DB
+    DB --> HELPERS
+    DB --> TRIG
+    SF --> ST
+
+    L --> ROB
+    L --> LLMS
+    L --> JLD
+    L --> SM
+
+    POM -->|drives| Client
+    POM --> ALLURE
 
     classDef edge fill:#1F3A5F,stroke:#1F3A5F,color:#fff;
     classDef cloud fill:#3ECF8E,stroke:#0f766e,color:#0b3d2e;
-    class SSR,SF,MW edge;
-    class AUTH,DB,RPC,ST cloud;
+    classDef seo fill:#F4A261,stroke:#a86432,color:#1a1a1a;
+    classDef qa fill:#6B4EFF,stroke:#3a2aa1,color:#fff;
+    class SSR,SF,MW,ATT edge;
+    class AUTH,DB,HELPERS,TRIG,ST cloud;
+    class ROB,LLMS,JLD seo;
+    class POM,ALLURE qa;
