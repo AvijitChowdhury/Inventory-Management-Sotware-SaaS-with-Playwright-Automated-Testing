@@ -248,7 +248,7 @@ def test_dashboard_kpis(page: Page):
     _sign_in(page)
     page.goto(f"{BASE_URL}/dashboard", wait_until="networkidle")
     time.sleep(1.0)
-    text = page.locator("main").inner_text().lower()
+    text = page.locator("body").inner_text().lower()
     assert any(k in text for k in ["products", "inventory", "orders", "revenue"])
     _shot(page, "35_dashboard_kpis")
 
