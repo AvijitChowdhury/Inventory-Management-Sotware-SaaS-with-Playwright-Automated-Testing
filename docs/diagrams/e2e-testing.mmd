@@ -1,0 +1,40 @@
+flowchart LR
+    subgraph Dev["👨‍💻 Developer / CI"]
+        RUN["pytest tests/test_e2e.py<br/>--alluredir=allure-results"]
+    end
+
+    subgraph PW["🎭 Playwright (Python, headless Chromium)"]
+        FX["session fixture:<br/>browser + context (1280×1600)"]
+        T1["test_landing_page"]
+        T2["test_auth_page"]
+        T3["test_admin_sign_in"]
+        T4["test_post_signin_flow"]
+        T5["test_navigation × 10 routes"]
+        T6["test_sign_out"]
+    end
+
+    subgraph App["🧪 StockFlow app under test"]
+        LOCAL["Vite dev server<br/>localhost:8080"]
+        SB["Supabase project<br/>(shared with prod schema)"]
+    end
+
+    subgraph Report["📊 Reporting"]
+        AR["allure-results/*.json<br/>+ PNG attachments"]
+        HTML["allure generate → HTML report"]
+        DOCS["docs/screenshots/*.png<br/>embedded in README"]
+    end
+
+    RUN --> FX
+    FX --> T1 --> T2 --> T3 --> T4 --> T5 --> T6
+    T1 & T2 & T3 & T4 & T5 & T6 -->|HTTP + auth| LOCAL
+    LOCAL <-->|SDK / RPC| SB
+    T1 & T2 & T3 & T4 & T5 & T6 -->|screenshot + allure.attach| AR
+    T1 & T2 & T3 & T4 & T5 & T6 -->|_shot| DOCS
+    AR --> HTML
+
+    classDef pw fill:#2EAD33,stroke:#1e6b21,color:#fff;
+    classDef app fill:#1F3A5F,stroke:#1F3A5F,color:#fff;
+    classDef rep fill:#F4A261,stroke:#a86432,color:#1a1a1a;
+    class FX,T1,T2,T3,T4,T5,T6 pw;
+    class LOCAL,SB app;
+    class AR,HTML,DOCS rep;
