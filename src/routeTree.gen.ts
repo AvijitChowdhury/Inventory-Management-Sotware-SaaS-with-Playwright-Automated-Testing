@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogInventoryVsStockRouteImport } from './routes/blog.inventory-vs-stock'
 import { Route as AuthenticatedSuppliersRouteImport } from './routes/_authenticated/suppliers'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSalesOrdersRouteImport } from './routes/_authenticated/sales-orders'
@@ -42,6 +43,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogInventoryVsStockRoute = BlogInventoryVsStockRouteImport.update({
+  id: '/blog/inventory-vs-stock',
+  path: '/blog/inventory-vs-stock',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSuppliersRoute = AuthenticatedSuppliersRouteImport.update({
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/sales-orders': typeof AuthenticatedSalesOrdersRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
+  '/blog/inventory-vs-stock': typeof BlogInventoryVsStockRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/sales-orders': typeof AuthenticatedSalesOrdersRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
+  '/blog/inventory-vs-stock': typeof BlogInventoryVsStockRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/_authenticated/sales-orders': typeof AuthenticatedSalesOrdersRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/suppliers': typeof AuthenticatedSuppliersRoute
+  '/blog/inventory-vs-stock': typeof BlogInventoryVsStockRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/sales-orders'
     | '/settings'
     | '/suppliers'
+    | '/blog/inventory-vs-stock'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/sales-orders'
     | '/settings'
     | '/suppliers'
+    | '/blog/inventory-vs-stock'
   id:
     | '__root__'
     | '/'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sales-orders'
     | '/_authenticated/settings'
     | '/_authenticated/suppliers'
+    | '/blog/inventory-vs-stock'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -209,6 +221,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  BlogInventoryVsStockRoute: typeof BlogInventoryVsStockRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -239,6 +252,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/inventory-vs-stock': {
+      id: '/blog/inventory-vs-stock'
+      path: '/blog/inventory-vs-stock'
+      fullPath: '/blog/inventory-vs-stock'
+      preLoaderRoute: typeof BlogInventoryVsStockRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/suppliers': {
@@ -357,6 +377,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  BlogInventoryVsStockRoute: BlogInventoryVsStockRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

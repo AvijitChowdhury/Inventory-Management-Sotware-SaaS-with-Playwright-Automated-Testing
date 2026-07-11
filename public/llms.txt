@@ -5,3 +5,7 @@
 ## Pages
 
 - [Home](/): Overview of StockFlow's inventory, purchasing, and sales features.
+
+## Blog
+
+- [Inventory vs Stock: What's the Difference?](/blog/inventory-vs-stock): Plain-English guide comparing inventory and stock across retail, manufacturing, accounting, and software.
