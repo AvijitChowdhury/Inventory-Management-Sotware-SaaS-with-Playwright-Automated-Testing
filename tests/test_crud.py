@@ -119,7 +119,7 @@ def test_suppliers_crud(page: Page):
 
     page.get_by_role("button", name="New supplier").click()
     dlg = page.get_by_role("dialog")
-    dlg.get_by_label("Company name").fill(name)
+    dlg.locator("input").first.fill(name)  # Company name (first required input)
     _shot(page, f"42_suppliers_form_{suffix}")
     dlg.get_by_role("button", name="Save").click()
     _wait_dialog_closed(page)
@@ -143,7 +143,7 @@ def test_customers_crud(page: Page):
 
     page.get_by_role("button", name="New customer").click()
     dlg = page.get_by_role("dialog")
-    dlg.get_by_label("Name").first.fill(name)
+    dlg.locator("input").first.fill(name)  # Name (first required input)
     _shot(page, f"44_customers_form_{suffix}")
     dlg.get_by_role("button", name="Save").click()
     _wait_dialog_closed(page)
@@ -168,8 +168,9 @@ def test_products_crud(page: Page):
 
     page.get_by_role("button", name="New product").click()
     dlg = page.get_by_role("dialog")
-    dlg.get_by_label("SKU").fill(sku)
-    dlg.get_by_label("Name").fill(name)
+    inputs = dlg.locator("input")
+    inputs.nth(0).fill(sku)   # SKU
+    inputs.nth(1).fill(name)  # Name
     _shot(page, f"46_products_form_{suffix}")
     dlg.get_by_role("button", name="Save").click()
     _wait_dialog_closed(page)
@@ -188,24 +189,28 @@ def test_products_crud(page: Page):
 @allure.story("Settings: organization name field is editable and persists")
 def test_settings_org_name(page: Page):
     _open_module(page, "/settings")
-    org_field = page.get_by_label("Organization name")
+    # Field lacks htmlFor; find the input under the "Organization name" label
+    org_field = page.locator("label:has-text('Organization name')").locator("xpath=following-sibling::input[1]").first
     expect(org_field).to_be_visible()
     original = org_field.input_value()
     suffix = uuid.uuid4().hex[:4]
-    new_name = f"{original.split(' [QA')[0]} [QA {suffix}]"
+    base = original.split(" [QA")[0] if " [QA" in original else original
+    new_name = f"{base} [QA {suffix}]"
     org_field.fill(new_name)
     _shot(page, f"48_settings_edit_{suffix}")
-    page.get_by_role("button", name="Save changes").click()
+    page.get_by_role("button", name="Save workspace").click()
     time.sleep(1.5)
 
     page.reload(wait_until="networkidle")
-    expect(page.get_by_label("Organization name")).to_have_value(new_name, timeout=6000)
+    org_field2 = page.locator("label:has-text('Organization name')").locator("xpath=following-sibling::input[1]").first
+    expect(org_field2).to_have_value(new_name, timeout=6000)
     _shot(page, f"48_settings_persisted_{suffix}")
 
     # restore
-    page.get_by_label("Organization name").fill(original)
-    page.get_by_role("button", name="Save changes").click()
+    org_field2.fill(base)
+    page.get_by_role("button", name="Save workspace").click()
     time.sleep(1.0)
+
 
 
 # --------------------------- REPORTS / INVENTORY smoke ---------------------------
