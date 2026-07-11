@@ -1,0 +1,7 @@
+"BROKEN","EPIC","FAILED","FEATURE","PASSED","SKIPPED","STORY","UNKNOWN"
+"0","","0","App shell","10","0","All primary navigation routes render","0"
+"0","","0","Marketing","1","0","Landing page renders","0"
+"0","","0","Onboarding","1","0","Signed-in user reaches onboarding or dashboard","0"
+"0","","0","Auth","1","0","Sign-in form renders","0"
+"0","","0","Auth","1","0","Sign out clears session and returns to /auth","0"
+"0","","0","Auth","1","0","Admin can sign in with email + password","0"
