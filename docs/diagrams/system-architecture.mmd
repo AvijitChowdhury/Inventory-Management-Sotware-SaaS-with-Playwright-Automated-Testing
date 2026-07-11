@@ -55,7 +55,7 @@ flowchart TB
     Client <-->|HTML + hydration| SSR
     Client --> ATT --> SF
     SF --> MW --> AUTH
-    MW -->|as auth.uid()| DB
+    MW -->|as current user| DB
     DB --> HELPERS
     DB --> TRIG
     SF --> ST
