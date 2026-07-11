@@ -137,8 +137,8 @@ Sidebar + top bar shell with organization switcher, KPI cards, and a guided next
 Categories, Suppliers, Customers, Products and Settings — create, verify, delete — all exercised by the CRUD suite.
 
 <p align="center">
-  <img src="docs/screenshots/40_categories_created_form_.png" alt="Category form" width="420"/>
-  <img src="docs/screenshots/46_products_form_.png" alt="Product form" width="420"/>
+  <img src="docs/screenshots/40_categories_created_form_b407d4.png" alt="Category form" width="420"/>
+  <img src="docs/screenshots/46_products_form_c1340b.png" alt="Product form" width="420"/>
 </p>
 
 ### 8. Sign-out
