@@ -24,6 +24,24 @@ export const Route = createFileRoute("/auth")({
     if (data.session) throw redirect({ to: "/dashboard" });
   },
   component: AuthPage,
+  head: () => ({
+    meta: [
+      { title: "Sign in or create an account — StockFlow" },
+      {
+        name: "description",
+        content:
+          "Sign in to StockFlow or create a free account to manage products, stock levels, purchase orders, and sales across every location.",
+      },
+      { name: "robots", content: "noindex, follow" },
+      { property: "og:title", content: "Sign in to StockFlow" },
+      {
+        property: "og:description",
+        content: "Access your StockFlow workspace to manage inventory in real time.",
+      },
+      { property: "og:url", content: "https://item-chum-flow.lovable.app/auth" },
+    ],
+    links: [{ rel: "canonical", href: "https://item-chum-flow.lovable.app/auth" }],
+  }),
 });
 
 function AuthPage() {
