@@ -41,7 +41,7 @@
 - **Multi-tenant by design.** Organizations are first-class; users belong to one or more orgs and every table is scoped by `organization_id` at the database layer.
 - **Secure by default.** Row Level Security enforced on every public table, `SECURITY DEFINER` helpers for role checks, storage buckets with per-org policies, and Google + email/password auth out of the box.
 - **Full-stack type safety.** TanStack Start + strict TypeScript + typed server functions + typed router — the same contract flows from database to UI.
-- **Production-grade QA.** A **15-test Playwright suite** covers marketing, auth, onboarding, dashboard and every application route, published as a browsable **Allure report** with screenshots on every step.
+- **Production-grade QA.** A **32-test Playwright suite** (Page Object Model) covers marketing, SEO, auth (valid + invalid credentials), onboarding, dashboard KPIs, protected-route redirects, blog content, every application route and sign-out — published as a browsable **Allure report** with screenshots on every step.
 - **Documented like a product.** System architecture, E2E flow, and every UI state are rendered as diagrams and screenshots checked into the repo.
 
 ---
