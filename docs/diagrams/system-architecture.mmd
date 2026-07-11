@@ -1,0 +1,48 @@
+flowchart TB
+    subgraph Client["🌐 Browser (React 19 + TanStack Router)"]
+        L["Landing / Marketing"]
+        A["/auth (Sign in / Sign up)"]
+        subgraph Protected["🔒 _authenticated layout (ssr:false gate)"]
+            OB["/onboarding"]
+            D["/dashboard"]
+            P["/products"]
+            I["/inventory"]
+            C["/categories"]
+            SUP["/suppliers"]
+            CUST["/customers"]
+            PO["/purchase-orders"]
+            SO["/sales-orders"]
+            R["/reports"]
+            S["/settings"]
+        end
+    end
+
+    subgraph Edge["⚡ Cloudflare Worker (TanStack Start SSR)"]
+        SSR["SSR renderer + Vite bundle"]
+        SF["createServerFn RPC handlers"]
+        MW["requireSupabaseAuth middleware"]
+    end
+
+    subgraph Cloud["☁️ Lovable Cloud (Supabase)"]
+        AUTH["Supabase Auth<br/>email + Google OAuth"]
+        DB[("PostgreSQL<br/>18 tables + RLS")]
+        RPC["Security-definer RPCs<br/>create_organization_with_owner<br/>is_org_member / has_role"]
+        ST["Storage buckets<br/>product-images · org-logos"]
+    end
+
+    L --> A
+    A -->|password / OAuth| AUTH
+    A --> OB
+    OB -->|createOrganization| SF
+    D & P & I & C & SUP & CUST & PO & SO & R & S -->|useServerFn| SF
+
+    Client <-->|HTML + hydration| SSR
+    SF --> MW --> AUTH
+    MW -->|Bearer JWT| DB
+    SF --> RPC --> DB
+    P & I -->|upload| ST
+
+    classDef edge fill:#1F3A5F,stroke:#1F3A5F,color:#fff;
+    classDef cloud fill:#3ECF8E,stroke:#0f766e,color:#0b3d2e;
+    class SSR,SF,MW edge;
+    class AUTH,DB,RPC,ST cloud;
