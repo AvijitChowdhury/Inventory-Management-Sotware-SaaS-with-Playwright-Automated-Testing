@@ -1,6 +1,7 @@
 flowchart LR
     subgraph Dev["Developer / CI"]
-        RUN["python tests/e2e_pom.py"]
+        RUN1["pytest tests/test_e2e.py<br/>32 flow tests"]
+        RUN2["pytest tests/test_crud.py<br/>7 CRUD tests"]
     end
 
     subgraph POM["Page Object Model (tests/pages/)"]
@@ -11,49 +12,62 @@ flowchart LR
         MP["ModulePage<br/>generic route wrapper"]
     end
 
-    subgraph Runner["e2e_pom.py orchestrator"]
-        FX["Playwright Chromium<br/>headless · 1280x1800"]
-        S1["Landing + Auth render"]
-        S2["Admin sign-in flow"]
-        S3["Onboarding (conditional)"]
-        S4["10 module routes"]
-        S5["Sign-out + public home"]
+    subgraph Flows["test_e2e.py — flow coverage"]
+        F1["Marketing + SEO<br/>landing · robots · sitemap · blog"]
+        F2["Auth<br/>sign-in · invalid creds · redirect"]
+        F3["Onboarding + Dashboard KPIs"]
+        F4["10 module routes<br/>+ sidebar / top-bar checks"]
+        F5["404 + sign-out"]
     end
 
-    subgraph App["StockFlow app under test"]
+    subgraph CRUD["test_crud.py — create/verify/delete"]
+        C1["Categories CRUD"]
+        C2["Suppliers CRUD"]
+        C3["Customers CRUD"]
+        C4["Products CRUD (SKU+name)"]
+        C5["Settings org-name persistence"]
+        C6["Inventory controls · Reports KPIs"]
+    end
+
+    subgraph App["StockPilot app under test"]
         LOCAL["Vite dev server<br/>localhost:8080"]
-        SB["Supabase<br/>Auth + Postgres + RLS"]
+        SF["createServerFn RPCs<br/>+ requireSupabaseAuth"]
+        SB["Supabase<br/>Auth · Postgres · RLS · Storage"]
     end
 
     subgraph Report["Reporting artifacts"]
-        JSON["tests/results/report.json<br/>step status + timings"]
-        SHOTS["docs/screenshots/*.png<br/>refreshed each run"]
-        ALLURE["allure-report/<br/>Allure HTML dashboard"]
+        RES["allure-results/<br/>39 result files"]
+        SHOTS["docs/screenshots/*.png<br/>~50 refreshed each run"]
+        ALLURE["allure-report/<br/>HTML dashboard 39/39"]
         RM["README.md<br/>embeds screenshots"]
     end
 
-    RUN --> FX
-    FX --> S1 --> S2 --> S3 --> S4 --> S5
+    RUN1 --> Flows
+    RUN2 --> CRUD
 
-    S1 --> LP
-    S2 --> AP
-    S3 --> OP
-    S4 --> MP
+    F1 --> LP
+    F2 --> AP
+    F3 --> OP
+    F4 --> MP
     LP & AP & OP & MP --> BP
 
-    S1 & S2 & S3 & S4 & S5 -->|HTTP| LOCAL
-    LOCAL <-->|SDK / RPC| SB
+    Flows & CRUD -->|HTTP| LOCAL
+    LOCAL --> SF --> SB
 
-    S1 & S2 & S3 & S4 & S5 -->|screenshot| SHOTS
-    S1 & S2 & S3 & S4 & S5 -->|step result| JSON
-    JSON --> ALLURE
+    Flows & CRUD -->|screenshot| SHOTS
+    Flows & CRUD -->|allure result| RES
+    RES --> ALLURE
     SHOTS --> RM
 
     classDef pom fill:#2EAD33,stroke:#1e6b21,color:#fff;
     classDef run fill:#6B4EFF,stroke:#3a2aa1,color:#fff;
+    classDef flows fill:#0EA5E9,stroke:#075985,color:#fff;
+    classDef crud fill:#DC2626,stroke:#7f1d1d,color:#fff;
     classDef app fill:#1F3A5F,stroke:#1F3A5F,color:#fff;
     classDef rep fill:#F4A261,stroke:#a86432,color:#1a1a1a;
     class BP,LP,AP,OP,MP pom;
-    class FX,S1,S2,S3,S4,S5 run;
-    class LOCAL,SB app;
-    class JSON,SHOTS,ALLURE,RM rep;
+    class RUN1,RUN2 run;
+    class F1,F2,F3,F4,F5 flows;
+    class C1,C2,C3,C4,C5,C6 crud;
+    class LOCAL,SF,SB app;
+    class RES,SHOTS,ALLURE,RM rep;
