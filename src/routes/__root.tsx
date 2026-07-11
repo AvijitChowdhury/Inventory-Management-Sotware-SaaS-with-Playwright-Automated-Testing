@@ -83,14 +83,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "StockFlow is a modern inventory management platform for retailers, distributors, and multi-location businesses. Track stock, purchasing, and sales in real time.",
+          "StockFlow is a modern multi-tenant inventory management platform for retailers, distributors, and multi-location businesses.",
       },
-      { property: "og:title", content: "StockFlow — Inventory Management SaaS" },
-      {
-        property: "og:description",
-        content:
-          "A single source of truth for products, stock, suppliers, customers, purchase orders, and sales orders.",
-      },
+      { property: "og:site_name", content: "StockFlow" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -102,6 +97,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              name: "StockFlow",
+              url: "https://item-chum-flow.lovable.app",
+              description:
+                "Multi-tenant inventory management platform for retailers, distributors, and multi-location businesses.",
+            },
+            {
+              "@type": "WebSite",
+              name: "StockFlow",
+              url: "https://item-chum-flow.lovable.app",
+            },
+          ],
+        }),
       },
     ],
   }),
