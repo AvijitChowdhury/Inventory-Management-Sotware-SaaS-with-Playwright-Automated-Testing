@@ -173,17 +173,25 @@ allure generate allure-results -o allure-report --clean
 allure open allure-report
 ```
 
-### Result — 15 / 15 passing
+### Result — 32 / 32 passing
 
 | Overview | Suites |
 |---|---|
 | ![Allure overview](docs/screenshots/allure_01_overview.png) | ![Allure suites](docs/screenshots/allure_02_suites.png) |
 
-| Timeline / graph | Behaviors |
+| Graphs | Behaviors |
 |---|---|
-| ![Allure graph](docs/screenshots/allure_03_graph.png) | ![Allure behaviors](docs/screenshots/allure_04_behaviors.png) |
+| ![Allure graphs](docs/screenshots/allure_03_graph.png) | ![Allure behaviors](docs/screenshots/allure_04_behaviors.png) |
 
-Covered flows: landing render, sign-up, sign-in, invalid credentials, onboarding create-org, dashboard KPIs, organization switcher, sidebar navigation to all 10 modules, protected-route redirect, sign-out.
+| Timeline | Categories |
+|---|---|
+| ![Allure timeline](docs/screenshots/allure_05_timeline.png) | ![Allure categories](docs/screenshots/allure_06_categories.png) |
+
+| Packages | New coverage screenshots |
+|---|---|
+| ![Allure packages](docs/screenshots/allure_07_packages.png) | ![Blog guide](docs/screenshots/31_blog_inventory_vs_stock.png) |
+
+Covered flows: landing render + CTAs, `robots.txt`, `sitemap.xml`, `/blog/inventory-vs-stock`, sign-up, sign-in, **invalid credentials**, **protected-route redirect**, onboarding create-org, dashboard KPIs, top-bar account menu, sidebar presence on 5 modules, direct navigation to all 10 modules, products / reports / settings content checks, 404 not-found, and sign-out.
 
 ---
 
